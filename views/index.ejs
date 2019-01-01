@@ -12,35 +12,13 @@
       <fieldset>
 
         <form action="/" method="post">
-          <input name="username" type="text" class="ghost-input" placeholder="Enter a Username">
-          <input type="submit" class="ghost-button" value="Get Profile">
+          <input name="summonerName" type="text" class="ghost-input" placeholder="Enter a Username">
+          <input type="submit" class="ghost-button" value="Get Match List">
         </form>
-        <% if(locals.username !== null){ %>
-          <p><%= locals.username %></p>
-        <% } %>
-
-        <% if(locals.error !== null){ %>
-          <p><%= locals.error %></p>
-        <% } %>
-
-        <form action="/timeline" method="post">
-          <input class="ghost-input" type="text" name="timeline" placeholder="Enter a Match ID">
-          <input class="ghost-button" type="submit" value="Get Timeline">
-        </form>
-        <% if(locals.matchId !== null) { %>
-          <p><%= locals.timeline %></p>
-        <% } %>
-
-        <% if(locals.error !== null){ %>
-          <p><%= locals.error %></p>
-        <% } %>
-
-        <form action="/match" method="post">
-          <input class="ghost-input" type="text" name="match" placeholder="Enter a Match ID">
-          <input class="ghost-button" type="submit" value="Get Match Stats">
-        </form>
-        <% if(locals.match !== null) { %>
-          <p><%= locals.match %></p>
+        <% if(locals.summonerName !== null){ %>
+          <% for(i=0; i<locals.summonerName.length; i++) { %>
+            <p><%= locals.summonerName[i] %></p>
+          <% } %>
         <% } %>
 
         <% if(locals.error !== null){ %>
