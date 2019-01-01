@@ -4,7 +4,7 @@ const express = require('express');
 const fs = require('fs');
 const app = express();
 
-let apiKey = 'RGAPI-f429f3a7-bec2-482d-bbd2-43266150e186';
+let apiKey = 'RGAPI-b7e3d714-9faf-4201-8cef-e49b34a391db';
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.set('view engine', 'ejs');
@@ -13,21 +13,16 @@ app.get('/', function(req, res) {
   res.render('index');
 });
 
-app.get('/match', function(req, res) {
-  res.render('index');
-});
-
 app.post('/', function(req, res) {
   let summName = req.body.summonerName;
+  console.log(summName);
   let urlSumm = `https://oc1.api.riotgames.com/lol/summoner/v4/summoners/by-name/${summName}?api_key=${apiKey}`;
 
   request(urlSumm, function(err, resp, body) {
     if(err) {
-      res.render('index', {summonerName: null, error: 'Error, try again'});
+      res.render('index', {summonerName: null, matchList:null, error: 'Error, try again'});
     } else {
       let jsonBody = JSON.parse(body);
-      
-
       let accId = jsonBody.accountId;
       console.log(accId);
 
@@ -35,7 +30,7 @@ app.post('/', function(req, res) {
 
       request(urlMatchList, function(err, resp, body) {
         if(err) {
-          res.render('index', {summonerName: null, error: 'Error, try again'});
+          res.render('index', {summonerName: null, matchList:null, error: 'Error, try again'});
         } else {
           let jsonBody = JSON.parse(body);
           let gameIds = [];
@@ -43,7 +38,7 @@ app.post('/', function(req, res) {
             gameIds.push(jsonBody.matches[i].gameId);
           }
 
-          res.render('index', {summonerName: gameIds, error: null});
+          res.render('index', {summonerName: summName, matchList: gameIds, error: null});
           console.log(jsonBody);
         }
       });
