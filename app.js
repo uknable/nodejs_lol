@@ -14,32 +14,44 @@ app.get('/', function(req, res) {
 });
 
 app.post('/', function(req, res) {
+
   let summName = req.body.summonerName;
-  console.log(summName);
   let urlSumm = `https://oc1.api.riotgames.com/lol/summoner/v4/summoners/by-name/${summName}?api_key=${apiKey}`;
 
   request(urlSumm, function(err, resp, body) {
     if(err) {
+    
       res.render('index', {summonerName: null, matchList:null, error: 'Error, try again'});
+    
     } else {
+
       let jsonBody = JSON.parse(body);
       let accId = jsonBody.accountId;
-      console.log(accId);
-
       let urlMatchList = `https://oc1.api.riotgames.com/lol/match/v4/matchlists/by-account/${accId}?endIndex=5&api_key=${apiKey}`;
 
       request(urlMatchList, function(err, resp, body) {
         if(err) {
+
           res.render('index', {summonerName: null, matchList:null, error: 'Error, try again'});
+        
         } else {
+
           let jsonBody = JSON.parse(body);
           let gameIds = [];
+          let matchDetails = [];
+
           for(i=0; i<Object.keys(jsonBody.matches).length; i++) {
             gameIds.push(jsonBody.matches[i].gameId);
           }
 
+          for(i=0; i<gameIds.length; i++) {
+            let urlMatchDetails = `https://oc1.api.riotgames.com/lol/match/v4/matches/${gameIds[i]}?api_key=${apiKey}}`;
+
+
+          }
+
           res.render('index', {summonerName: summName, matchList: gameIds, error: null});
-          console.log(jsonBody);
+          
         }
       });
     }
