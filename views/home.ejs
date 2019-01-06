@@ -1,0 +1,52 @@
+<% include header %>
+<div class="container">
+  <fieldset>
+
+    <form class="form-inline" action="/" method="post">
+      <div class="form-group">
+        <input name="summonerName" type="text" class="form-control-plaintext" id="summonerName" placeholder="Enter Summoner Name">
+      </div>
+      <button type="submit" class="btn btn-primary">Get Match List</button>
+    </form>
+
+    <% if(locals.summonerName) { %>
+      <h1><%= locals.summonerName %></h1>
+    <% } %>
+
+    <% if(locals.matchList){ %>
+
+      <% for(i=0; i<locals.matchList.length; i++) { %>
+        <div class="card">
+          <div class="card-header" id="heading_<%= i %>">
+            <button class="btn btn-link" data-toggle="collapse" data-target="#collapse_<%= i %>">
+              Match Id #<%= locals.matchList[i] %>
+            </button>
+          </div>
+
+          <div id="collapse_<%= i %>" class="collapse">
+            <div class="card-body">
+              hello <%= locals.matchList[i] %>
+            </div>
+          </div>
+        </div>
+      <% } %>
+
+    <% } %>
+
+
+    <% if(locals.error){ %>
+      <p><%= locals.error %></p>
+    <% } %>
+
+  </fieldset>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+<script type="text/javascript">
+  $(document).ready(function() {
+    console.log("hello");
+  });
+</script>
+<% include footer %>
