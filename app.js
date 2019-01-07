@@ -4,7 +4,13 @@ const express = require('express');
 const fs = require('fs');
 const app = express();
 
-let apiKey = 'RGAPI-deed69ff-63db-40a2-a22e-a42e293f1db5';
+let apiKey = 'RGAPI-486a5d48-58be-42d5-be62-fc04dc73df7e';
+let urlHost = "https://oc1.api.riotgames.com";
+let testQuery = "?endIndex=5";
+
+let summonerName = "";
+let accountId = "";
+let gameIds = [];
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.set('view engine', 'ejs');
@@ -13,50 +19,52 @@ app.get('/', function(req, res) {
   res.render('home');
 });
 
-app.post('/', function(req, res) {
+app.post('/', (req, res) => {
+  summonerName = req.body.summonerName;
+  console.log(summonerName);
 
-  let summName = req.body.summonerName;
-  let urlSumm = `https://oc1.api.riotgames.com/lol/summoner/v4/summoners/by-name/${summName}?api_key=${apiKey}`;
+  //find unique accound id
+  let urlSummoner = `${urlHost}/lol/summoner/v4/summoners/by-name/${summonerName}?api_key=${apiKey}`
 
-  request(urlSumm, function(err, resp, body) {
+  request(urlSummoner, (err, resp, body) => {
     if(err) {
-
-      res.render('home', {summonerName: null, matchList:null, error: 'Error, try again'});
+      res.render("home", { error: "error url summoner" });
 
     } else {
 
       let jsonBody = JSON.parse(body);
-      let accId = jsonBody.accountId;
-      let urlMatchList = `https://oc1.api.riotgames.com/lol/match/v4/matchlists/by-account/${accId}?endIndex=5&api_key=${apiKey}`;
+      accountId = jsonBody.accountId;
 
-      request(urlMatchList, function(err, resp, body) {
+      //get match history list
+      let urlMatchHistory = `${urlHost}/lol/match/v4/matchlists/by-account/${accountId}${testQuery}&api_key=${apiKey}`
+
+      request(urlMatchHistory, (err, resp, body) => {
         if(err) {
-
-          res.render('home', {summonerName: null, matchList:null, error: 'Error, try again'});
-
+          res.render("home", { error: "error url match history" });
         } else {
-
           let jsonBody = JSON.parse(body);
-          let gameIds = [];
-          let matchDetails = [];
 
-          for(i=0; i<Object.keys(jsonBody.matches).length; i++) {
+          gameIds = [];
+          for(i=0; i<Object.keys(jsonBody.matches).length;i++) {
             gameIds.push(jsonBody.matches[i].gameId);
           }
-
-          for(i=0; i<gameIds.length; i++) {
-            let urlMatchDetails = `https://oc1.api.riotgames.com/lol/match/v4/matches/${gameIds[i]}?api_key=${apiKey}}`;
-          }
-
-          res.render('home', {summonerName: summName, matchList: gameIds, error: null});
+          res.redirect(`/${summonerName}`);
         }
       });
     }
   });
 });
 
+app.get("/:summonerName", (req, res) => {
+  res.render('home', { summonerName: summonerName, matchList: gameIds });
+});
 
+app.get("/:summonerName/:matchId", (req, res) => {
 
-app.listen(3000, function() {
+  //res.json({ summonerName: req.params.summonerName, matchId: req.params.matchId});
+  res.render("details");
+})
+
+app.listen(3000, () => {
   console.log('listening on 3000');
 });
