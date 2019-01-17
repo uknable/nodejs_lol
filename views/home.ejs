@@ -18,7 +18,7 @@
       <% for(i=0; i<locals.matchList.length; i++) { %>
         <div class="card">
           <div class="card-header" id="heading_<%= i %>">
-            <button href="#" class="btn btn-link" data-toggle="collapse" data-target="#collapse_<%= i %>">
+            <button class="btn btn-link" data-toggle="collapse" data-target="#collapse_<%= i %>">
               Match Id #<%= locals.matchList[i] %>
             </button>
           </div>
@@ -26,7 +26,9 @@
           <div id="collapse_<%= i %>" class="collapse">
             <div class="card-body">
               <%= locals.matchList[i] %>
-              <a href="/<%= locals.summonerName %>/<%= locals.matchList[i] %>">details</a>
+              <form class="form-inline" action="/<%= locals.summonerName %>/<%= locals.matchList[i] %>" method="post">
+                <button class="btn btn-primary" type="submit">Get Match Details</button>
+              </form>
             </div>
           </div>
         </div>

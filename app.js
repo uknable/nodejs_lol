@@ -2,15 +2,18 @@ const bodyParser = require('body-parser');
 const request = require('request');
 const express = require('express');
 const fs = require('fs');
+const d3 = require('d3');
 const app = express();
 
-let apiKey = 'RGAPI-486a5d48-58be-42d5-be62-fc04dc73df7e';
+let apiKey = 'RGAPI-62bbf04e-8a2e-4a1f-880d-91dfa80dd157';
 let urlHost = "https://oc1.api.riotgames.com";
 let testQuery = "?endIndex=5";
 
 let summonerName = "";
 let accountId = "";
-let gameIds = [];
+let matchIds = [];
+let matchId = "";
+let deathCords = [];
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.set('view engine', 'ejs');
@@ -34,6 +37,7 @@ app.post('/', (req, res) => {
 
       let jsonBody = JSON.parse(body);
       accountId = jsonBody.accountId;
+      console.log(jsonBody);
 
       //get match history list
       let urlMatchHistory = `${urlHost}/lol/match/v4/matchlists/by-account/${accountId}${testQuery}&api_key=${apiKey}`
@@ -44,9 +48,9 @@ app.post('/', (req, res) => {
         } else {
           let jsonBody = JSON.parse(body);
 
-          gameIds = [];
+          matchIds = [];
           for(i=0; i<Object.keys(jsonBody.matches).length;i++) {
-            gameIds.push(jsonBody.matches[i].gameId);
+            matchIds.push(jsonBody.matches[i].gameId);
           }
           res.redirect(`/${summonerName}`);
         }
@@ -56,14 +60,42 @@ app.post('/', (req, res) => {
 });
 
 app.get("/:summonerName", (req, res) => {
-  res.render('home', { summonerName: summonerName, matchList: gameIds });
+  res.render('home', { summonerName: summonerName, matchList: matchIds });
+});
+
+app.post("/:summonerName/:matchId", (req, res) => {
+  matchId = req.params.matchId;
+
+  let urlTimeline = `${urlHost}/lol/match/v4/timelines/by-match/${matchId}?api_key=${apiKey}`
+
+  request(urlTimeline, (err, resp, body) => {
+    if(err) {
+      res.render("details", { error: "error url match history" });
+    } else {
+      let jsonBody = JSON.parse(body);
+
+      deathCords = [];
+
+      for(i=0; i<Object.keys(jsonBody.frames).length;i++) {
+        for(j=0; j<Object.keys(jsonBody.frames[i].events).length;j++) {
+          if(jsonBody.frames[i].events[j].type === "CHAMPION_KILL") {
+            deathCords.push([
+              jsonBody.frames[i].events[j].position.x,
+              jsonBody.frames[i].events[j].position.y,
+            ]);
+          }
+        }
+      }
+      res.redirect(`/${summonerName}/${matchId}`);
+    }
+  });
+
+
 });
 
 app.get("/:summonerName/:matchId", (req, res) => {
-
-  //res.json({ summonerName: req.params.summonerName, matchId: req.params.matchId});
-  res.render("details");
-})
+  res.render("details", { deathCords: deathCords });
+});
 
 app.listen(3000, () => {
   console.log('listening on 3000');
